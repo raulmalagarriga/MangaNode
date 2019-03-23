@@ -1,0 +1,8 @@
+{
+  "name": "node-pg-manga",
+  "author": "Raul, Javier",
+  "dependencies": {
+    "express": "^4.16.4",
+    "pg": "^6.4.2"
+  }
+}
