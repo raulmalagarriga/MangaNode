@@ -61,5 +61,34 @@ module.exports = function(passport) {
           });
       })
   );
+  passport.use(
+    'local-login',
+    new LocalStrategy({
+        usernameField : 'username',
+        passwordField : 'password',
+        passReqToCallback : true // allows us to pass back the entire request to the callback
+    },
+    function(req, username, password, done) { // callback with email and password from our form
+    
+      pool.query("SELECT * FROM users WHERE username = '" + username + "'", function(err, rows){
+            if (err)
+                return done(err);
+            // loi o day thi phai
+            console.log(rows.rows.length);
+            if (rows.rows.length == 0) {
+                return done(null, false, req.flash('loginMessage', 'No user found.')); // req.flash is the way to set flashdata using connect-flash
+            }
+
+            // if the user is found but the password is wrong
+            console.log(rows.rows[0]);
+            if (!bcrypt.compareSync(password, rows.rows[0].password))
+                return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.')); // create the loginMessage and save it to session as flashdata
+
+            // all is well, return successful user
+            return done(null, rows.rows[0]);
+        });
+    })
+);
+};
 
     
