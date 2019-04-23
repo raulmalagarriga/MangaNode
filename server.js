@@ -13,7 +13,7 @@ var flash    = require('connect-flash');
 
 // connect to our database
 
-//require('./config/passport')(passport); // pass passport for configuration
+require('./config/passport')(passport); // pass passport for configuration
 
 
 
