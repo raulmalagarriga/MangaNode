@@ -4,7 +4,6 @@ const auth = require('./../middlewares/isAuth');
 var db = require('../helpers/db');
 let route = express.Router();
 
-function register (password, username,name,email){
 route.post('/createUser',(req,res)=>{
   var newUser = {
 
@@ -37,12 +36,31 @@ route.post('/createUser',(req,res)=>{
     });
   });
 });
-}
-module.exports = route;
 
 
-router.post('/login', auth.isLogged, function (req, res, next) {
-    passport.authenticate('local', function (err, user, info) {
+route.post('/login', function (req, res, next) {
+  var logUser = {
+    username: req.body.username,
+    password: req.body.password
+  };
+  db.connect().then((obj)=>{
+    obj.one("SELECT * FROM users WHERE user_username='"+logUser.username+"' AND user_password='"+logUser.password+"'")
+    .then((data)=>{
+      console.log(data);
+      res.send({data:data,status:200});
+      obj.done();
+    }).catch((error)=>{
+      console.log(error);
+      res.send({error:error,msg:'Usuario no conseguido',status:404});
+      obj.done();
+    });
+  }).catch((error)=>{
+    console.log(error);
+    res.send({error:error,msg:'Algo salio mal',status:500});
+  });
+  console.log("Logeado "+logUser);
+  /*
+   passport.authenticate('local', function (err, user, info) {
         if (err) {
             return next(err);
         }
@@ -61,15 +79,16 @@ router.post('/login', auth.isLogged, function (req, res, next) {
                 status: 'Login successful!'
             });
         });
-    })(req, res, next);
+    })(req, res, next);*/
 });
 
 
 
-router.get('/logout', auth.isAuth, function (req, res) {
+route.get('/logout', auth.isAuth, function (req, res) {
     req.logout();
     res.status(200).send({
         status: 'Bye!'
     });
 });
 
+module.exports = route;
