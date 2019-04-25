@@ -11,7 +11,11 @@ router.post('/createUser',(req,res)=>{
     email: "javierzirulxions@gmail.com"
   }
   db.connect().then((obj)=>{
-    obj.one("INSERT INTO users (user_password, user_username, user_name, user_creation_time, user_email) VALUES ('"+newUser.password+"','"+newUser.username+"','"+newUser.name+"',CURRENT_TIMESTAMP,'"newUser.email"')")
+    obj.one("INSERT INTO users (user_password, user_username, user_name, user_email) VALUES ('"+newUser.password+"','"+newUser.username+"','"+newUser.name+"','"+newUser.email+"')")
+    .then((data)=>{
+        console.log(data);
+        res.send({data:data, status: 200});
+        obj.done();
   }).catch((error)=>{
     console.log(error);
     res.send({
@@ -19,7 +23,7 @@ router.post('/createUser',(req,res)=>{
       msg:'No se ha creado el usuario',
       status:500
     });
-    obj.done();
+    obj.done();});
   }).catch((error)=>{
     console.log(error);
     res.send({
