@@ -4,12 +4,15 @@ const auth = require('./../middlewares/isAuth');
 var db = require('../helpers/db');
 let route = express.Router();
 
+function register (password, username,name,email){
 route.post('/createUser',(req,res)=>{
   var newUser = {
+
     username: req.body.username,
     password: req.body.password,
     name: req.body.name,
     email: req.body.email
+
   };
   db.connect().then((obj)=>{
     obj.one("INSERT INTO users (user_password, user_username, user_name, user_email) VALUES ('"+newUser.password+"','"+newUser.username+"','"+newUser.name+"','"+newUser.email+"')")
@@ -34,15 +37,10 @@ route.post('/createUser',(req,res)=>{
     });
   });
 });
-
+}
 module.exports = route;
-/*
-router.get('/value', auth.isAuth, (req, res) => {
-    res.send(req.session.passport);
-});
-*/
 
-/*
+
 router.post('/login', auth.isLogged, function (req, res, next) {
     passport.authenticate('local', function (err, user, info) {
         if (err) {
@@ -65,13 +63,13 @@ router.post('/login', auth.isLogged, function (req, res, next) {
         });
     })(req, res, next);
 });
-*/
 
-/*
+
+
 router.get('/logout', auth.isAuth, function (req, res) {
     req.logout();
     res.status(200).send({
         status: 'Bye!'
     });
 });
-*/
+
