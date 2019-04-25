@@ -5,15 +5,12 @@ var db = require('../helpers/db');
 let route = express.Router();
 const bcrypt = require('bcryptjs');
 
-
 route.post('/createUser',(req,res)=>{
   var newUser = {
-
     username: req.body.username,
     password: bcrypt.hashSync(req.body.password, 10), //bcrypt.hashSync('myPassword', null);
     name: req.body.name,
     email: req.body.email
-
   };
   db.connect().then((obj)=>{
     obj.one("INSERT INTO users (user_password, user_username, user_name, user_email) VALUES ('"+newUser.password+"','"+newUser.username+"','"+newUser.name+"','"+newUser.email+"')")
@@ -40,7 +37,30 @@ route.post('/createUser',(req,res)=>{
 });
 
 
-route.post('/login',passport.authenticate('local'), function (req, res, next) {
+route.post('/login', auth.isLogged, function (req, res, next) {
+  passport.authenticate('local', function(err, user, info){
+    if (err) {
+      return next(err);
+    }
+    if (!user) {
+      return res.status(401).json({
+        err: info
+      });
+    }
+    req.logIn(user, function(err){
+      if (err) {
+        return res.status(500).json({
+          err: 'No ha sido posible iniciar sesion'
+        });
+      }
+      res.status(200).json({
+        status: 'Sesion iniciaida'
+      });
+    });
+  })(req, res, next);
+    console.log(req.session);
+  });
+/*
   var logUser = {
     username: req.body.username,
     password: req.body.password
@@ -62,8 +82,10 @@ route.post('/login',passport.authenticate('local'), function (req, res, next) {
   });
   console.log("Logeado "+logUser);
   passport.authenticate('local',function(req, username, password, done){
-    
+
   });
+
+  */
   /*
    passport.authenticate('local', function (err, user, info) {
         if (err) {
@@ -85,10 +107,8 @@ route.post('/login',passport.authenticate('local'), function (req, res, next) {
             });
         });
     })(req, res, next);*/
-    console.log(req.session);
-});
-
-
+//    console.log(req.session);
+//});
 
 route.get('/logout', auth.isAuth, function (req, res) {
     req.logout();
