@@ -1,15 +1,17 @@
 const express = require('express');
 const passport = require('passport');
-const auth = require('./../middlewares/isAuth')
-let router = express.Router();
+const auth = require('./../middlewares/isAuth');
+var db = require('../helpers/db');
+let route = express.Router();
 
-router.post('/createUser',(req,res)=>{
+route.post('/createUser',(req,res)=>{
+  console.log("HOLA");
   var newUser = {
     username: "Zirulxions",
     password: "123456789",
     name: "Javier Delgado",
     email: "javierzirulxions@gmail.com"
-  }
+  };
   db.connect().then((obj)=>{
     obj.one("INSERT INTO users (user_password, user_username, user_name, user_email) VALUES ('"+newUser.password+"','"+newUser.username+"','"+newUser.name+"','"+newUser.email+"')")
     .then((data)=>{
@@ -34,7 +36,7 @@ router.post('/createUser',(req,res)=>{
   });
 });
 
-module.exports = router;
+module.exports = route;
 /*
 router.get('/value', auth.isAuth, (req, res) => {
     res.send(req.session.passport);
