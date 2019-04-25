@@ -3,12 +3,14 @@ const passport = require('passport');
 const auth = require('./../middlewares/isAuth');
 var db = require('../helpers/db');
 let route = express.Router();
+const bcrypt = require('bcryptjs');
+
 
 route.post('/createUser',(req,res)=>{
   var newUser = {
 
     username: req.body.username,
-    password: req.body.password,
+    password: bcrypt.hashSync(req.body.password, 10), //bcrypt.hashSync('myPassword', null);
     name: req.body.name,
     email: req.body.email
 
