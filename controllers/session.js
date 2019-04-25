@@ -38,7 +38,7 @@ route.post('/createUser',(req,res)=>{
 });
 
 
-route.post('/login', function (req, res, next) {
+route.post('/login',passport.authenticate('local'), function (req, res, next) {
   var logUser = {
     username: req.body.username,
     password: req.body.password
@@ -59,6 +59,9 @@ route.post('/login', function (req, res, next) {
     res.send({error:error,msg:'Algo salio mal',status:500});
   });
   console.log("Logeado "+logUser);
+  passport.authenticate('local',function(req, username, password, done){
+    
+  });
   /*
    passport.authenticate('local', function (err, user, info) {
         if (err) {
@@ -80,6 +83,7 @@ route.post('/login', function (req, res, next) {
             });
         });
     })(req, res, next);*/
+    console.log(req.session);
 });
 
 
