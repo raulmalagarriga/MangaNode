@@ -3,4 +3,7 @@ const config = {
     port: 8000
 }
 
+//Clave Raul: password
+//Clave Javier: 123456789
+
 module.exports = config;
