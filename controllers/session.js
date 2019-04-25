@@ -5,12 +5,11 @@ var db = require('../helpers/db');
 let route = express.Router();
 
 route.post('/createUser',(req,res)=>{
-  console.log("HOLA");
   var newUser = {
-    username: "Zirulxions",
-    password: "123456789",
-    name: "Javier Delgado",
-    email: "javierzirulxions@gmail.com"
+    username: req.body.username,
+    password: req.body.password,
+    name: req.body.name,
+    email: req.body.email
   };
   db.connect().then((obj)=>{
     obj.one("INSERT INTO users (user_password, user_username, user_name, user_email) VALUES ('"+newUser.password+"','"+newUser.username+"','"+newUser.name+"','"+newUser.email+"')")
