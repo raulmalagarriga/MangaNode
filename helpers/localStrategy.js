@@ -12,9 +12,9 @@ module.exports = new localStrategy({
         }
         User.comparePassword(password, user.password).then((isMatch)=>{
             if (isMatch)
-                return done(null, user);
+                return done(null, user, {message: "Sesion Iniciada"});
             else
-                return done(null, false);
+                return done(null, false, {message: "Contrasenia Invalida"});
         }).catch((err)=>{
             return done(null, false);
         });

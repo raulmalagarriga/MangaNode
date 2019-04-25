@@ -4,7 +4,7 @@ const app = express();
 const config = require('./helpers/config');
 let passport = require('passport');
 
-app.use('/views', express.static(__dirname + '/public'));
+//app.use('/views', express.static(__dirname + '/public'));
 app.use(express.json());
 app.use(express.urlencoded({extended:false}));
 app.use(session({
@@ -22,6 +22,7 @@ app.get('/', function (req, res) {
 });
 
 passport.use(require('./helpers/localStrategy'));
+
 passport.serializeUser(function(user, done) {
     done(null, user);
 });

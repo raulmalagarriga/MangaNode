@@ -4,6 +4,7 @@ const auth = require('./../middlewares/isAuth');
 var db = require('../helpers/db');
 let route = express.Router();
 const bcrypt = require('bcryptjs');
+const multer = require('multer');
 
 route.post('/createUser',(req,res)=>{
   var newUser = {
@@ -13,7 +14,12 @@ route.post('/createUser',(req,res)=>{
     email: req.body.email
   };
   db.connect().then((obj)=>{
-    obj.one("INSERT INTO users (user_password, user_username, user_name, user_email) VALUES ('"+newUser.password+"','"+newUser.username+"','"+newUser.name+"','"+newUser.email+"')")
+    obj.one('INSERT INTO users (user_password, user_username, user_name, user_email) VALUES ($1,$2,$3,$4) RETURNING user_id, user_username, user_name, user_email',
+    [bcrypt.hashSync(req.body.password, 10),
+      req.body.username,
+      req.body.name,
+      req.body.email
+    ])
     .then((data)=>{
         console.log(data);
         res.send({data:data, status: 200});
@@ -36,9 +42,11 @@ route.post('/createUser',(req,res)=>{
   });
 });
 
-
 route.post('/login', auth.isLogged, function (req, res, next) {
   passport.authenticate('local', function(err, user, info){
+    console.log("HOLA");
+    console.log(req.session.user);
+
     if (err) {
       return next(err);
     }
@@ -59,7 +67,7 @@ route.post('/login', auth.isLogged, function (req, res, next) {
     });
   })(req, res, next);
   console.log("Session ID: "+req.session.id);
-  console.log(req.session)
+  console.log(req.session);
 });
 
 route.get('/logout', function (req, res) {
@@ -69,5 +77,25 @@ route.get('/logout', function (req, res) {
         status: 'Adios..!'
     });
 });
+
+let storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, './public/storage');
+    },
+    filename: function (req, file, cb) {
+      cb(null, `${file.originalname}`)
+       }
+    });
+let upload = multer({storage:storage});
+
+/*
+router.get('/getFile/:filename',(req,res)=>{
+    res.download(`${__dirname}/../public/uploads/${req.params.filename}`);
+});
+
+router.post('/uploadMultFile',upload.array('files[]'),(req,res)=>{
+    res.send({status:200});
+});
+*/
 
 module.exports = route;
