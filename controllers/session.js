@@ -169,7 +169,7 @@ route.post('/createChapter',upload.array('files[]'),(req,res)=>{
     .then((data)=>{
       let mId = data.manga_id;
       console.log(data);
-      onj.one('INSERT INTO chapters (manga_id, chapter_number, chapter_title, chapter_location, chapter_num_pages) VALUES ($1,$2,$3,$4,$5) RETURNING manga_id, chapter_title, chapter_number',
+      obj.one('INSERT INTO chapters (manga_id, chapter_number, chapter_title, chapter_location, chapter_num_pages) VALUES ($1,$2,$3,$4,$5) RETURNING manga_id, chapter_title, chapter_number',
       [parseInt(mId),parseInt(mChap),chapTitle,chapLocation,chapPag])
       .then((data)=>{
         console.log(data);
