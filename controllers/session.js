@@ -5,14 +5,15 @@ var db = require('../helpers/db');
 let route = express.Router();
 const bcrypt = require('bcryptjs');
 const multer = require('multer');
+//var userId;
 
 route.post('/createUser',(req,res)=>{
-  var newUser = {
+  /*var newUser = {
     username: req.body.username,
     password: bcrypt.hashSync(req.body.password, 10),
     name: req.body.name,
     email: req.body.email
-  };
+  };*/
   db.connect().then((obj)=>{
     obj.one('INSERT INTO users (user_password, user_username, user_name, user_email) VALUES ($1,$2,$3,$4) RETURNING user_id, user_username, user_name, user_email',
     [bcrypt.hashSync(req.body.password, 10),
@@ -78,6 +79,45 @@ route.get('/logout', function (req, res) {
     });
 });
 
+route.post('/comments',function(req, res){
+  /*
+  db.connect().then((obj)=>{
+    
+    obj.one('SELECT user_id FROM users WHERE user_username=$1',[req.body.id])
+    .then((data)=>{
+      console.log(data);
+      res.send({data:data, status: 200});
+      userId = data.user_id;
+      obj.done();
+    }).catch((error)=>{
+      console.log(error);
+      res.send({
+        error:error,
+        msg:'no se tomo el id',
+        status:500
+      });*/
+    db.connect().then((obj)=>{
+
+      obj.one('INSERT INTO comments_manga (user_id, manga_id, comment_content) VALUES ($1,$2,$3) RETURNING comment_id, user_id, manga_id, comment_content',
+      [req.body.uId,
+      req.body.mangaId,
+      req.body.commentContent])
+      .then((data)=>{
+        console.log(data);
+        res.send({data:data, status: 200});
+        obj.done;
+      }).catch((error)=>{
+        console.log(error);
+        res.send({
+          error:error,
+          msg:'no se inserto el comentario',
+          status:500
+        });
+    });
+  });
+});
+//});
+//});
 let storage = multer.diskStorage({
     destination: function (req, file, cb) {
       cb(null, './public/storage');
