@@ -75,7 +75,7 @@ route.get('/logout', function (req, res) {
 
 
 route.post('/comments',function(req, res){
-  
+
     db.connect().then((obj)=>{
 
       obj.one('INSERT INTO comments_manga (user_id, manga_id, comment_content) VALUES ($1,$2,$3) RETURNING comment_id, user_id, manga_id, comment_content',
@@ -157,16 +157,29 @@ let storage = multer.diskStorage({
     });
 let upload = multer({storage:storage});
 
-route.post('/uploadMultFile',upload.array('files[]'),(req,res)=>{
-  console.log("Multiple Files");
-  console.log("Username: "+req.body.username);
-  console.log("Manga Name: "+req.body.mangaName);
+route.post('/createChapter',upload.array('files[]'),(req,res)=>{
+  let usrName = req.body.username;
+  let mName = req.body.mangaName;
+  let mChap = req.body.mangaChapter;
+  let chapTitle = req.body.chapterTitle;
+  let chapPag = req.body.chapterPages;
+  let chapLocation = __dirname+"./../public/storage/"+usrName+"/"+mName+"/"+mChap+"/";
   db.connect().then((obj)=>{
-    obj.one('SELECT user_id FROM users WHERE user_username=$1',[req.body.username])
+    obj.one('SELECT manga_id FROM manga WHERE manga_name=$1',[req.body.mangaName])
     .then((data)=>{
+      let mId = data.manga_id;
       console.log(data);
-      res.send({data:data, status: 200});
-      obj.done();
+      onj.one('INSERT INTO chapters (manga_id, chapter_number, chapter_title, chapter_location, chapter_num_pages) VALUES ($1,$2,$3,$4,$5) RETURNING manga_id, chapter_title, chapter_number',
+      [parseInt(mId),parseInt(mChap),chapTitle,chapLocation,chapPag])
+      .then((data)=>{
+        console.log(data);
+        res.send({data:data,status:200});
+      }).catch((error)=>{
+        console.log(error);
+        res.send({error:error,msg:'No se creo el capitulo',status:500});
+      });
+      //res.send({data:data, status: 200});
+      //obj.done();
     }).catch((error)=>{
       console.log(error);
       res.send({error:error,msg:'Usuario Invalido',status:500});
@@ -198,7 +211,7 @@ route.post('/createManga',function (req,res){
       }).catch((error)=>{
         console.log(error);
         res.send({error:error,msg:'No se creo el manga',status:500});
-      })
+      });
       //res.send({data:data, status: 200});
       //obj.done();
     }).catch((error)=>{
