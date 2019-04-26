@@ -105,7 +105,7 @@ route.post('/comments',function(req, res){
       .then((data)=>{
         console.log(data);
         res.send({data:data, status: 200});
-        obj.done;
+        obj.done();
       }).catch((error)=>{
         console.log(error);
         res.send({
@@ -118,6 +118,30 @@ route.post('/comments',function(req, res){
 });
 //});
 //});
+
+route.post('/like', function(req, res){
+  var like__;
+  if(like__ = true){
+    db.connect().then((obj)=>{
+      obj.one('INSERT INTO likes_manga (user_id, manga_id) VALUES ($1,$2) RETURNING user_id, manga_id',
+      [req.body.uId,
+      req.body.mangaId])
+      .then((data)=>{
+        console.log(data);
+        res.send({data:data, status: 200});
+        obj.done();
+      }).catch((error)=>{
+        console.log(error);
+        res.send({
+          error:error, msg : 'no like insertado', status: 500
+        });
+      });
+    });
+  }else{
+    console.log('no like');
+  }
+});
+
 let storage = multer.diskStorage({
     destination: function (req, file, cb) {
       cb(null, './public/storage');
