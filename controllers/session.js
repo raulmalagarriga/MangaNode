@@ -78,18 +78,21 @@ route.get('/logout', function (req, res) {
     });
 });
 
-var dir = "./public/uploads/";
+const fs = require('fs');
+var dir = "./public/storage/";
 let storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir + ${req.params.username} + "/" + ${req.params.mangaName} + "/" + ${req.params.mangaChapter},  { recursive: true }, (err) => {
+      let fdir = __dirname+"./../public/storage/"+req.body.username+"/"+req.body.mangaName+"/"+req.body.mangaChapter+"/"
+      console.log("Dir: " + fdir);
+      if (!fs.existsSync(fdir)) {
+        fs.mkdirSync(fdir,  { recursive: true }, (err) => {
           if (err) throw err;
         });
         console.log("Directory Created.");
       } else {
         console.log("Directory Exists.");
       }
-      cb(null, './public/storage');
+      cb(null, "./public/storage/"+req.body.username+"/"+req.body.mangaName+"/"+req.body.mangaChapter);
     },
     filename: function (req, file, cb) {
       cb(null, `${file.originalname}`)
@@ -97,13 +100,15 @@ let storage = multer.diskStorage({
     });
 let upload = multer({storage:storage});
 
-
+/*
 route.get('/getFile/:filename',(req,res)=>{
-    res.download(`${__dirname}/../public/uploads/${req.params.username}/${req.params.mangaChapter}/${req.params.filename}`);
+    res.download(`${__dirname}/../public/storage/${req.params.username}/${req.params.mangaName}/${req.params.mangaChapter}/${req.params.filename}`);
 });
+*/
 
 route.post('/uploadMultFile',upload.array('files[]'),(req,res)=>{
-    res.send({status:200});
+  console.log("Multiple Files");
+    res.send({status:200,message:"Archivos subidos"});
 });
 
 
