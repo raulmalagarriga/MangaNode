@@ -83,7 +83,7 @@ route.get('/logout', function (req, res) {
 route.post('/comments',function(req, res){
   /*
   db.connect().then((obj)=>{
-    
+
     obj.one('SELECT user_id FROM users WHERE user_username=$1',[req.body.id])
     .then((data)=>{
       console.log(data);
@@ -175,8 +175,53 @@ route.get('/getFile/:filename',(req,res)=>{
 
 route.post('/uploadMultFile',upload.array('files[]'),(req,res)=>{
   console.log("Multiple Files");
-    res.send({status:200,message:"Archivos subidos"});
+  console.log("Username: "+req.body.username);
+  console.log("Manga Name: "+req.body.mangaName);
+  db.connect().then((obj)=>{
+    obj.one('SELECT user_id FROM users WHERE user_username=$1',[req.body.username])
+    .then((data)=>{
+      console.log(data);
+      res.send({data:data, status: 200});
+      obj.done();
+    }).catch((error)=>{
+      console.log(error);
+      res.send({error:error,msg:'Usuario Invalido',status:500});
+    });
+  });
+  res.send({status:200,message:"Archivos subidos"});
 });
 
+route.post('/createManga',function (req,res){
+  let usName = req.body.username;
+  let mName = req.body.mangaName;
+  let mSynop = req.body.mangaSynopsis;
+  let gMang = req.body.genreManga;
+  db.connect().then((obj)=>{
+    obj.one('SELECT user_id FROM users WHERE user_username=$1',[req.body.username])
+    .then((data)=>{
+      let usrId = data.user_id;
+      let mDir = __dirname+"./../public/storage/"+usName+"/"+mName;
+      if (!fs.existsSync(mDir)) {
+        fs.mkdirSync(mDir, { recursive: true });
+      };
+      console.log("ID: "+usrId);
+      obj.one('INSERT INTO manga (user_id, manga_name, manga_synopsis, genres_id) VALUES ($1,$2,$3,$4) RETURNING manga_name, manga_synopsis',
+      [parseInt(usrId),mName,mSynop,gMang])
+      .then((data)=>{
+        console.log(data);
+        res.send({data:data,status:200});
+        //obj.done();
+      }).catch((error)=>{
+        console.log(error);
+        res.send({error:error,msg:'No se creo el manga',status:500});
+      })
+      //res.send({data:data, status: 200});
+      //obj.done();
+    }).catch((error)=>{
+      console.log(error);
+      res.send({error:error,msg:'Usuario Invalido',status:500});
+    });
+  });
+});
 
 module.exports = route;
