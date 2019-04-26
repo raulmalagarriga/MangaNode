@@ -78,8 +78,17 @@ route.get('/logout', function (req, res) {
     });
 });
 
+var dir = "./public/uploads/";
 let storage = multer.diskStorage({
     destination: function (req, file, cb) {
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir + ${req.params.username} + "/" + ${req.params.mangaName} + "/" + ${req.params.mangaChapter},  { recursive: true }, (err) => {
+          if (err) throw err;
+        });
+        console.log("Directory Created.");
+      } else {
+        console.log("Directory Exists.");
+      }
       cb(null, './public/storage');
     },
     filename: function (req, file, cb) {
@@ -88,14 +97,14 @@ let storage = multer.diskStorage({
     });
 let upload = multer({storage:storage});
 
-/*
-router.get('/getFile/:filename',(req,res)=>{
-    res.download(`${__dirname}/../public/uploads/${req.params.filename}`);
+
+route.get('/getFile/:filename',(req,res)=>{
+    res.download(`${__dirname}/../public/uploads/${req.params.username}/${req.params.mangaChapter}/${req.params.filename}`);
 });
 
-router.post('/uploadMultFile',upload.array('files[]'),(req,res)=>{
+route.post('/uploadMultFile',upload.array('files[]'),(req,res)=>{
     res.send({status:200});
 });
-*/
+
 
 module.exports = route;
