@@ -121,8 +121,6 @@ route.post('/comments',function(req, res){
 //});
 
 route.post('/like', function(req, res){
-  var like__;
-  if(like__ = true){
     db.connect().then((obj)=>{
       obj.one('INSERT INTO likes_manga (user_id, manga_id) VALUES ($1,$2) RETURNING user_id, manga_id',
       [req.body.uId,
@@ -138,9 +136,6 @@ route.post('/like', function(req, res){
         });
       });
     });
-  }else{
-    console.log('no like');
-  }
 });
 
 
